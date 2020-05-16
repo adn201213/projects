@@ -1,0 +1,754 @@
+package Presentation;
+
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
+import Business.AdnanStoreInvoice;
+import Business.AdnanStoreInvoiceDetails;
+import Business.Employee;
+import Data.AdnanInvoiceDBAccess;
+import Data.AdnanInvoiceDetailesDBAccess;
+import Data.Constants;
+
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+
+public class AdnanInvoice extends JInternalFrame {
+	// Instnce Variable
+
+	private JTextField txtItemPrice;
+	private JTextField txtDiscount;
+	private JTextField txtQuantity;
+	private JComboBox comboItemCode;
+	private JComboBox comItemName;
+	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private static JTable itemTable;
+	private JTextField txtTax;
+	private JTextField txtTotalPrice;
+	private int employeeNumber = 0;
+	// ModifyEmployee form=new ModifyEmployee();
+	AdnanInvoicePrint form = null;
+	private JTextField txtNetPrice;
+	private JTextField txtInvoiceId;
+	private JTextField txtPrice;
+	private JTextField textInvoicTax;
+	private JTextField txtInvoiceTotalPrice;
+	private JLabel lblcurentDate = null;
+	DefaultTableModel model = null;
+	private double invoicePrice=0;
+	private double invoiceTax=0;
+	private double invoiceTotalPriace=0;
+	//AdnanInvoiceDBAccess db = new AdnanInvoiceDBAccess();
+	AdnanInvoiceDetailesDBAccess db=new AdnanInvoiceDetailesDBAccess();
+	ArrayList<AdnanStoreInvoiceDetails> itemsDetailes=new ArrayList<>();
+	DateFormat dateformat = new SimpleDateFormat("dd-MM-yyyy");
+	Date current = new Date();
+	Calendar cal = Calendar.getInstance();
+
+
+	/**
+	 * Launch the application.
+	 */
+
+	/**
+	 * Create the frame.
+	 */
+
+	public AdnanInvoice() {
+
+		getContentPane().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+			}
+		});
+		setTitle("Best Computer Invoice Form");
+		setNormalBounds(new Rectangle(0, 0, 1300, 600));
+		setIconifiable(true);
+		setClosable(true);
+		setBounds(100, 100, 901, 499);
+		getContentPane().setLayout(null);
+		JPanel ItemPanel = new JPanel();
+		ItemPanel.setBounds(10, 31, 344, 411);
+		ItemPanel.setLayout(null);
+		ItemPanel.setBorder(new TitledBorder(
+				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
+				"Item Information", TitledBorder.LEADING, TitledBorder.TOP, null,
+				UIManager.getColor("CheckBoxMenuItem.selectionBackground")));
+		getContentPane().add(ItemPanel);
+
+		txtItemPrice = new JTextField();
+		txtItemPrice.setEnabled(false);
+		txtItemPrice.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		txtItemPrice.setBounds(131, 91, 171, 25);
+		ItemPanel.add(txtItemPrice);
+		txtItemPrice.setColumns(10);
+
+		txtDiscount = new JTextField();
+		txtDiscount.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		txtDiscount.setBounds(131, 163, 171, 25);
+		ItemPanel.add(txtDiscount);
+		txtDiscount.setColumns(10);
+
+		JLabel lblItemCode = new JLabel("Item Code");
+		lblItemCode.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		lblItemCode.setBounds(23, 34, 95, 25);
+		ItemPanel.add(lblItemCode);
+
+		JLabel lblItemName = new JLabel("Item Name");
+		lblItemName.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		lblItemName.setBounds(23, 65, 118, 25);
+		ItemPanel.add(lblItemName);
+
+		JLabel lblItemPrice = new JLabel("Item Price");
+		lblItemPrice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		lblItemPrice.setBounds(23, 96, 79, 25);
+		ItemPanel.add(lblItemPrice);
+
+		txtQuantity = new JTextField();
+		txtQuantity.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		txtQuantity.setColumns(10);
+		txtQuantity.setBounds(131, 127, 171, 25);
+		ItemPanel.add(txtQuantity);
+
+		JLabel lblQuantity = new JLabel("Quantity");
+		lblQuantity.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		lblQuantity.setBounds(23, 132, 84, 25);
+		ItemPanel.add(lblQuantity);
+
+		JLabel lblDiscount = new JLabel("Discount");
+		lblDiscount.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		lblDiscount.setBounds(23, 165, 125, 25);
+		ItemPanel.add(lblDiscount);
+		txtTax = new JTextField();
+		txtTax.setEnabled(false);
+		txtTax.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		txtTax.setColumns(10);
+		txtTax.setBounds(131, 239, 171, 25);
+		ItemPanel.add(txtTax);
+		JLabel lblItemTax = new JLabel("Tax");
+		lblItemTax.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		lblItemTax.setBounds(21, 241, 120, 25);
+		ItemPanel.add(lblItemTax);
+		txtTotalPrice = new JTextField();
+		txtTotalPrice.setEnabled(false);
+		txtTotalPrice.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		txtTotalPrice.setColumns(10);
+		txtTotalPrice.setBounds(131, 275, 171, 25);
+		ItemPanel.add(txtTotalPrice);
+		JLabel lblTotalPrice = new JLabel("Total Price");
+		lblTotalPrice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		lblTotalPrice.setBounds(21, 277, 120, 25);
+		ItemPanel.add(lblTotalPrice);
+
+		txtNetPrice = new JTextField();
+		txtNetPrice.setEnabled(false);
+		txtNetPrice.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		txtNetPrice.setColumns(10);
+		txtNetPrice.setBounds(131, 199, 171, 25);
+		ItemPanel.add(txtNetPrice);
+
+		JLabel lblNetPrice = new JLabel("Net Price");
+		lblNetPrice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		lblNetPrice.setBounds(23, 204, 120, 25);
+		ItemPanel.add(lblNetPrice);
+
+		JButton btnDeleteItem = new JButton("Delete Item");
+		btnDeleteItem.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		btnDeleteItem.setBounds(23, 372, 103, 30);
+		ItemPanel.add(btnDeleteItem);
+         //This button to add items to invoice and it calculate price and tax automatic
+		JButton btnAddItem = new JButton("Add Item");
+		btnAddItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int invoiceID=Integer.parseInt(txtInvoiceId.getText());
+					String serialNumber=(String) comboItemCode.getSelectedItem();
+					String itemName =(String) comItemName.getSelectedItem();
+						double unitPrice=Double.parseDouble(txtItemPrice.getText());
+						int Quantity=Integer.parseInt(txtQuantity.getText());
+						//These Commands to calcualte invoice tax and price automatically
+						double discountPercentage=Double.parseDouble(txtDiscount.getText());
+						double discount=(unitPrice*Quantity)*discountPercentage;
+						double netPrice=(unitPrice*Quantity)-discount;
+						txtNetPrice.setText(String.valueOf(netPrice));
+						//double NetPrice=Double.parseDouble(txtNetPrice.getText());
+						double tax=Constants.TAX;
+						//double totalTax=Double.parseDouble(txtTax.getText());
+						double totalTax=netPrice*tax;
+						txtTax.setText(String.valueOf(totalTax));
+						//double totalPrice=Double.parseDouble(txtTotalPrice.getText());
+						double totalPrice=Math.round((netPrice+totalTax)*100.0)/100.0;
+						txtTotalPrice.setText(String.valueOf(totalPrice));
+			AdnanStoreInvoiceDetails item=new AdnanStoreInvoiceDetails(invoiceID,serialNumber,
+					unitPrice,Quantity,discount,totalTax,totalPrice,netPrice);
+			//db.addItem(item);
+			itemsDetailes.add(item);
+			Object[] items = new Object[] { 
+		item.getSerialNumber(),itemName,item.getUnitPrice(),item.getQuantity(),
+		item.getDiscount(),item.getNetPrice(),item.getTotalItemTax(),item.getTotalItemPrice()};
+					AddRowToTable(items);
+		//These Commands to add taxes and prices of items 
+		//to the total invoice tax and price autoamtically
+		invoicePrice=invoicePrice+Double.parseDouble(txtNetPrice.getText());
+		 txtPrice.setText(String.valueOf(invoicePrice));
+		 invoiceTax=invoiceTax+Double.parseDouble( txtTax.getText());
+		 textInvoicTax.setText(String.valueOf(invoiceTax));
+		 invoiceTotalPriace= invoiceTotalPriace+Double.parseDouble(txtTotalPrice.getText());
+		 txtInvoiceTotalPrice.setText(String.valueOf(invoiceTotalPriace));
+		
+		 //This Method to clear the text boxes
+		 clearTextBoxex();
+			}
+		});
+		btnAddItem.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		btnAddItem.setBounds(23, 331, 103, 30);
+		ItemPanel.add(btnAddItem);
+
+		JButton btnEditItem = new JButton("Edit Item");
+		btnEditItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				String serial= (String) comboItemCode.getSelectedItem();   
+				
+				if (itemsDetailes!=null) {
+					for(AdnanStoreInvoiceDetails itemDetail:itemsDetailes) {
+						//JOptionPane.showMessageDialog(null,itemDetail.getProductName());
+						if (serial.equals(itemDetail.getSerialNumber())){
+							JOptionPane.showMessageDialog(null,serial +" "+itemDetail.getSerialNumber());
+							itemDetail.setSerialNumber(serial);
+							comboItemCode.setSelectedItem(itemDetail.getSerialNumber());
+							
+							String itemName= (String) comItemName.getSelectedItem();
+							itemDetail.setProductName(itemName);
+							comItemName.setSelectedItem(itemDetail.getProductName());
+							
+							double ItemPrice=Double.parseDouble(txtItemPrice.getText());
+							itemDetail.setUnitPrice(ItemPrice);
+							txtItemPrice.setText(String.valueOf(itemDetail.getUnitPrice()));
+							
+							int quantity=Integer.parseInt(txtQuantity.getText());
+							itemDetail.setQuantity(quantity);
+							txtQuantity.setText(String.valueOf(itemDetail.getQuantity()));
+							
+							double discount=Double.parseDouble(txtDiscount.getText());
+							itemDetail.setDiscount(discount);
+							txtDiscount.setText(String.valueOf(itemDetail.getDiscount()));
+							
+							double netPrice=Double.parseDouble(txtNetPrice.getText());
+							itemDetail.setNetPrice(netPrice);
+							txtNetPrice.setText(String.valueOf(itemDetail.getNetPrice()));
+							
+						     double tax=Double.parseDouble(txtTax.getText());
+						     itemDetail.setTotalItemTax(tax);
+							txtTax.setText(String.valueOf(itemDetail.getTotalItemTax()));
+							
+							double totalPrice=Double.parseDouble(txtTotalPrice.getText());
+							itemDetail.setTotalItemPrice(totalPrice);
+							txtTotalPrice.setText(String.valueOf(itemDetail.getTotalItemPrice()));
+
+							//itemsDetailes.add(item);
+							Object[] items = new Object[] { 
+									itemDetail.getSerialNumber(),itemName,itemDetail.getUnitPrice(),itemDetail.getQuantity(),
+									itemDetail.getDiscount(),itemDetail.getNetPrice(),itemDetail.getTotalItemTax(),itemDetail.getTotalItemPrice()};
+									AddRowToTable(items);
+						}
+						}
+						
+					}
+			
+			}
+		});
+		btnEditItem.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		btnEditItem.setBounds(182, 329, 120, 30);
+		ItemPanel.add(btnEditItem);
+
+		JButton btnResete = new JButton("Reset");
+		btnResete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ArrayList<AdnanStoreInvoiceDetails> products = new ArrayList<>();
+				// AddRowToTable(Object[] datarow);
+				// db=new AdnanInvoiceDBAccess();
+				products = db.getAllProduct();
+				
+				for (AdnanStoreInvoiceDetails product : products) {
+					comboItemCode.addItem(product.getSerialNumber());
+					comItemName.addItem(product.getProductName());
+					Object[] productsData = new Object[] { 
+					product.getSerialNumber(), product.getProductName(),product.getUnitPrice()};
+					AddRowToTable(productsData);
+				}
+			
+			}
+		});
+		btnResete.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		btnResete.setBounds(182, 370, 120, 30);
+		ItemPanel.add(btnResete);
+
+		comItemName = new JComboBox();
+		comItemName.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		comItemName.setBackground(Color.WHITE);
+		comItemName.setBounds(131, 65, 171, 22);
+		ItemPanel.add(comItemName);
+
+		 comboItemCode = new JComboBox();
+		 comboItemCode.addActionListener(new ActionListener() {
+		 	public void actionPerformed(ActionEvent e) {
+		 		String item=(String) comboItemCode.getSelectedItem();
+			 	AdnanStoreInvoiceDetails product;
+			 	product=db.getProduct(item);
+			 	String s=product.getSerialNumber();	
+			 	comboItemCode.setSelectedItem(s);
+			 	String s1=product.getProductName();
+			 	comItemName.setSelectedItem(s1);
+			 	txtItemPrice.setText(String.valueOf((product.getUnitPrice())));
+		 	}
+		 });
+		comboItemCode.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		comboItemCode.setBackground(UIManager.getColor("Button.highlight"));
+		comboItemCode.setBounds(131, 34, 171, 22);
+		ItemPanel.add(comboItemCode);
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setBounds(374, 143, 834, 301);
+		getContentPane().add(scrollPane);
+
+		itemTable = new JTable();
+		itemTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+				SelectRowToTable();
+			}
+		});
+		itemTable.setSurrendersFocusOnKeystroke(true);
+		itemTable.setCellSelectionEnabled(true);
+		itemTable.setColumnSelectionAllowed(true);
+		itemTable.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		scrollPane.setViewportView(itemTable);
+		model = new DefaultTableModel(new Object[][] {}, new String[] { "Code", "Item Name", "Unit Price", "Quantity",
+				"Discount", "Net Price", "Tax", "Total" });
+		itemTable.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"Code", "Item Name", "Unit Price", "Quantity", "Discount", "Net Price", "Tax", "Total"
+			}
+		));
+		itemTable.getColumnModel().getColumn(0).setPreferredWidth(68);
+		itemTable.getColumnModel().getColumn(1).setPreferredWidth(130);
+		itemTable.getColumnModel().getColumn(2).setPreferredWidth(61);
+		itemTable.getColumnModel().getColumn(3).setPreferredWidth(56);
+		itemTable.getColumnModel().getColumn(4).setPreferredWidth(58);
+		itemTable.getColumnModel().getColumn(5).setPreferredWidth(56);
+		itemTable.getColumnModel().getColumn(6).setPreferredWidth(55);
+		itemTable.getColumnModel().getColumn(7).setPreferredWidth(90);
+		JTableHeader head = itemTable.getTableHeader();
+		head.setFont(new Font("Times New Roman", Font.BOLD, 16));
+
+		itemTable.setBackground(Color.white);
+		itemTable.setForeground(Color.black);
+		Font font = new Font("", 1, 16);
+		itemTable.setFont(font);
+		itemTable.setRowHeight(25);
+
+		JPanel OperationPanel = new JPanel();
+		OperationPanel.setBounds(10, 456, 1200, 80);
+		getContentPane().add(OperationPanel);
+		OperationPanel.setBorder(new TitledBorder(
+				new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
+				"Operations", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 120, 215)));
+       
+		//itemTable.addMouseListener(new MouseAdapter() {
+			//@Override
+		//	public void mouseClicked(MouseEvent e) {
+
+			//	SelectRowToTable();
+			//}
+		//});
+		
+		//This button or Save an Invoice
+		JButton btnNewInvoice = new JButton("New Invoice");
+		btnNewInvoice.setBounds(10, 32, 120, 30);
+		btnNewInvoice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//this code to fill ComboBox
+				ArrayList<AdnanStoreInvoice> invoices = new ArrayList<AdnanStoreInvoice>();
+				invoices=db.getAllInvoices();
+				AdnanStoreInvoice lastInvoice = invoices.get(invoices.size() - 1); 
+				int invoiceId1=lastInvoice.getInvoiceID()+1;
+				txtInvoiceId.setText(String.valueOf(invoiceId1));
+				ArrayList<AdnanStoreInvoiceDetails> products = new ArrayList<>();
+				products = db.getAllProduct();
+				for (AdnanStoreInvoiceDetails product : products) {
+					comboItemCode.addItem(product.getSerialNumber());
+					comItemName.addItem(product.getProductName());
+				}
+					//This code to New Invoice
+				/* int invoiceID=Integer.parseInt(txtInvoiceId.getText());
+				try {
+				Date invoiceDate= new SimpleDateFormat("dd-MM-yyyy").parse(lblcurentDate.getText());
+					double invoicePrice=Double.parseDouble(txtPrice.getText());
+					double invoiceTax=Double.parseDouble(textInvoicTax.getText());
+				 double totalInvoicPrice=Double.parseDouble(txtInvoiceTotalPrice.getText());
+		AdnanStoreInvoice invoice=new AdnanStoreInvoice(invoiceID,invoiceDate,invoicePrice,invoiceTax,totalInvoicPrice);
+		db.addInvoice(invoice);
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}*/	
+			}
+		});
+		OperationPanel.setLayout(null);
+		// buttonGroup.add(btnNewButton_1);
+		btnNewInvoice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		OperationPanel.add(btnNewInvoice);
+//This Button for Modify
+		JButton btnEditInvoice = new JButton("Edit Invoice");
+		btnEditInvoice.setBounds(270, 33, 120, 30);
+		btnEditInvoice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+              AdnanStoreInvoice invoice=null;
+				int invoiceID=Integer.parseInt(txtInvoiceId.getText());
+				invoice=db.getStoreInvoice(invoiceID);
+				try {	
+				Date invoiceDate= new SimpleDateFormat("dd-MM-yyyy").parse(lblcurentDate.getText());
+				invoice.setInvoiceDate(invoiceDate);
+				double invoicePrice=Double.parseDouble(txtPrice.getText());
+				invoice.setInvoicePrice(invoicePrice);
+				double invoiceTax=Double.parseDouble(textInvoicTax.getText());
+				invoice.setInvoiceTax(invoiceTax);
+				 double totalInvoicPrice=Double.parseDouble(txtInvoiceTotalPrice.getText());
+				 invoice.setTotalInvoicPrice(totalInvoicPrice);
+		//AdnanStoreInvoice invoice=new AdnanStoreInvoice(invoiceID,invoiceDate,invoicePrice,invoiceTax,totalInvoicPrice);
+		db.updatInvoice(invoice);
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			
+			}
+		});
+		btnEditInvoice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		OperationPanel.add(btnEditInvoice);
+		JButton btnDeleteInvoice = new JButton("Delete Invoice");
+		btnDeleteInvoice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int invoiceID=Integer.parseInt(txtInvoiceId.getText());
+				AdnanStoreInvoice deletedInvoice=null;
+				deletedInvoice=db.getStoreInvoice(invoiceID);
+				db.deleteInvoice(deletedInvoice);
+			}
+		});
+		btnDeleteInvoice.setBounds(400, 32, 130, 30);
+		btnDeleteInvoice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		OperationPanel.add(btnDeleteInvoice);
+		JButton btnDsiplayInvoices = new JButton("Dsiplay Invoices");
+		btnDsiplayInvoices.setBounds(540, 32, 145, 30);
+		btnDsiplayInvoices.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		btnDsiplayInvoices.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ArrayList<AdnanStoreInvoice> invoices = new ArrayList<>();
+				// AddRowToTable(Object[] datarow);
+				// db=new AdnanInvoiceDBAccess();
+				invoices = db.getAllInvoices();
+				for (AdnanStoreInvoice inv : invoices) {
+					Object[] invoicData = new Object[] { 
+		inv.getInvoiceID(), inv.getInvoiceDate(),inv.getInvoicePrice(),inv.getInvoiceTax(),inv.getTotalInvoicPrice() };
+					AddRowToTable(invoicData);
+				}
+			}
+		});
+		OperationPanel.add(btnDsiplayInvoices);
+		JButton btnFindInvoice = new JButton("Find Invoice");
+		btnFindInvoice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//int invoiceID=Integer.parseInt(txtInvoiceId.getText());
+				AdnanStoreInvoice foundInvoice=null;
+			int input =Integer.parseInt((JOptionPane.showInputDialog(null, "Please,Enter invoice Id")));
+				//int num1=Integer.parseInt(name);
+				foundInvoice=db.getStoreInvoice(input);
+				if (foundInvoice!=null) {
+				txtInvoiceId.setText(String.valueOf(foundInvoice.getInvoiceID()));
+				lblcurentDate.setText(String.valueOf(foundInvoice.getInvoiceDate()));
+				txtPrice.setText(String.valueOf(foundInvoice.getInvoicePrice()));
+				textInvoicTax.setText(String.valueOf(foundInvoice.getInvoiceTax()));
+				txtInvoiceTotalPrice.setText(String.valueOf(foundInvoice.getTotalInvoicPrice()));
+				}
+				else 
+					JOptionPane.showMessageDialog(null, "The invoice is not exist");
+			}
+		});
+		btnFindInvoice.setBounds(690, 32, 120, 30);
+		btnFindInvoice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		OperationPanel.add(btnFindInvoice);
+		JButton btnprintInvoice = new JButton("print Invoice");
+		btnprintInvoice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// MainForm.formInvoice();
+			
+				
+				
+				AdnanInvoicePrint form = new AdnanInvoicePrint();
+				MainForm.desktop.add(form, Integer.valueOf(5));
+				form.setSize(1000, 550);
+				form.requestFocus(false);
+				form.setIconifiable(true);
+				form.setLocation(50, 10);
+				form.setClosable(true);
+				form.moveToFront();
+				BasicInternalFrameUI ui = (BasicInternalFrameUI) form.getUI();
+				for (MouseListener listner : ui.getNorthPane().getMouseListeners()) {
+					ui.getNorthPane().removeMouseListener(listner);
+				}
+			}
+		});
+		btnprintInvoice.setBounds(820, 32, 130, 30);
+		btnprintInvoice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		OperationPanel.add(btnprintInvoice);
+		JButton btnReset = new JButton("Reset");
+		btnReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
+		btnReset.setBounds(970, 32, 100, 30);
+		btnReset.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		OperationPanel.add(btnReset);
+		JButton btnClose = new JButton("Close");
+		btnClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+				
+				
+			}
+		});
+		btnClose.setBounds(1090, 32, 105, 30);
+		btnClose.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		OperationPanel.add(btnClose);
+		//this button to save invoice and all items
+		JButton btnSaveInvoice = new JButton("Save Invoice");
+		btnSaveInvoice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				//This code to New Invoice
+				 int invoiceID=Integer.parseInt(txtInvoiceId.getText());
+				try {
+				Date invoiceDate= new SimpleDateFormat("dd-MM-yyyy").parse(lblcurentDate.getText());
+					double invoicePrice=Double.parseDouble(txtPrice.getText());
+					double invoiceTax=Double.parseDouble(textInvoicTax.getText());
+				 double totalInvoicPrice=Double.parseDouble(txtInvoiceTotalPrice.getText());
+		AdnanStoreInvoice invoice=new AdnanStoreInvoice(invoiceID,invoiceDate,invoicePrice,invoiceTax,totalInvoicPrice);
+		db.addInvoice(invoice);
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//These new items details
+				if (itemsDetailes!=null) {
+				//for(AdnanStoreInvoiceDetails itemDetail:itemsDetailes) {
+					
+				//	db.addItem(itemDetail);
+					
+				//}
+					db.addItems(itemsDetailes);
+					
+				}
+			}
+		});
+		btnSaveInvoice.setFont(new Font("Times New Roman", Font.BOLD, 16));
+		btnSaveInvoice.setBounds(140, 32, 120, 30);
+		OperationPanel.add(btnSaveInvoice);
+
+		JPanel InvoicePanel = new JPanel();
+		InvoicePanel.setBounds(374, 31, 834, 104);
+		getContentPane().add(InvoicePanel);
+		InvoicePanel.setLayout(null);
+		InvoicePanel.setBorder(new TitledBorder(
+		new EtchedBorder(EtchedBorder.LOWERED, new Color(255, 255, 255), new Color(160, 160, 160)),
+		"Invoice Information", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 120, 215)));
+		JLabel lblInvoiceId = new JLabel("Invoice Id");
+		lblInvoiceId.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lblInvoiceId.setBounds(10, 40, 81, 25);
+		InvoicePanel.add(lblInvoiceId);
+		txtInvoiceId = new JTextField();
+		txtInvoiceId.setEnabled(false);
+		txtInvoiceId.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		txtInvoiceId.setBounds(89, 40, 100, 25);
+		InvoicePanel.add(txtInvoiceId);
+		txtInvoiceId.setColumns(10);
+		JLabel lblPrice = new JLabel("Price");
+		lblPrice.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lblPrice.setBounds(222, 40, 48, 25);
+		InvoicePanel.add(lblPrice);
+
+		txtPrice = new JTextField();
+		txtPrice.setEnabled(false);
+		txtPrice.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		txtPrice.setBounds(272, 40, 100, 25);
+		InvoicePanel.add(txtPrice);
+		txtPrice.setColumns(10);
+
+		JLabel lblInvoiceTax = new JLabel("Tax");
+		lblInvoiceTax.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lblInvoiceTax.setBounds(408, 40, 48, 25);
+		InvoicePanel.add(lblInvoiceTax);
+
+		textInvoicTax = new JTextField();
+		textInvoicTax.setEnabled(false);
+		textInvoicTax.setFont(new Font("Times New Roman", Font.BOLD, 13));
+		textInvoicTax.setColumns(10);
+		textInvoicTax.setBounds(458, 40, 120, 25);
+		InvoicePanel.add(textInvoicTax);
+
+		JLabel lblInvoicePrice = new JLabel("Total Price");
+		lblInvoicePrice.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lblInvoicePrice.setBounds(600, 40, 90, 25);
+		InvoicePanel.add(lblInvoicePrice);
+
+		txtInvoiceTotalPrice = new JTextField();
+		txtInvoiceTotalPrice.setEnabled(false);
+		txtInvoiceTotalPrice.setFont(new Font("Tahoma", Font.BOLD, 13));
+		txtInvoiceTotalPrice.setColumns(10);
+		txtInvoiceTotalPrice.setBounds(680, 40, 120, 25);
+		InvoicePanel.add(txtInvoiceTotalPrice);
+
+		lblcurentDate = new JLabel("");
+		lblcurentDate.setFont(new Font("Times New Roman", Font.BOLD, 14));
+		lblcurentDate.setText(dateformat.format(current));
+		lblcurentDate.setBounds(10, 15, 287, 14);
+		InvoicePanel.add(lblcurentDate);
+//This button for Find
+
+	}
+
+	public static void AddRowToTable(Object[] datarow) {
+
+		DefaultTableModel model1 = (DefaultTableModel) itemTable.getModel();
+
+		model1.addRow(datarow);
+	}
+	
+	public void SelectRowToTable() {
+		// int i=Integer.parseInt((String) object);
+		DefaultTableModel model1 = (DefaultTableModel) itemTable.getModel();
+		int i = itemTable.getSelectedRow();
+		if (i >= 0) {
+			String serial=model1.getValueAt(i,0).toString();
+			String itemName=model1.getValueAt(i,1).toString();
+			if (itemsDetailes!=null) {
+				for(AdnanStoreInvoiceDetails itemDetail:itemsDetailes) {
+					//JOptionPane.showMessageDialog(null,itemDetail.getProductName());
+					if (serial.equals(itemDetail.getSerialNumber())){
+						
+						comboItemCode.setSelectedItem(itemDetail.getSerialNumber());
+						comItemName.setSelectedItem(itemName);
+						txtItemPrice.setText(String.valueOf(itemDetail.getUnitPrice()));
+						txtQuantity.setText(String.valueOf(itemDetail.getQuantity()));
+						txtDiscount.setText(String.valueOf(itemDetail.getDiscount()));
+						txtNetPrice.setText(String.valueOf(itemDetail.getNetPrice()));
+						txtTax.setText(String.valueOf(itemDetail.getTotalItemTax()));
+						txtTotalPrice.setText(String.valueOf(itemDetail.getTotalItemPrice()));
+
+					
+					}
+					}
+					
+				}
+
+					
+				}
+	}
+			
+	public void clearTextBoxex() {
+		
+		comboItemCode.setSelectedItem("");
+		comItemName.setSelectedItem("");
+		txtItemPrice.setText("");
+		txtQuantity.setText("");
+		txtDiscount.setText("");
+		txtNetPrice.setText("");
+		txtTax.setText("");
+		txtTotalPrice.setText("");
+	
+		
+	}
+
+//This Method for validate 
+	public boolean isValidData() {
+
+		// if (!Validator1.isPresent(txtItemCode, "First Name")) {
+		// if (!Validator1.isPresent1(txtLastName, "Last Name"))
+		// return false;
+		// }
+		// if (!Validator1.isPresent(txtItemName, "Last Name"))
+		// return false;
+		// if (!Validator1.isExistName(txtItemCode, txtItemName,"First Name")) {
+		// return false;
+		// }
+
+		if (!Validator1.isPresent(txtItemPrice, "JobTitle"))
+			return false;
+		// if (!Validator1.isPresent(txtDateOfBirth, "DateOfBirth"))
+		// return false;
+
+		if (!Validator1.isPresent(txtQuantity, "Address"))
+			return false;
+		if (!Validator1.isPresent(txtDiscount, "PostalCode "))
+			return false;
+		if (!Validator1.isPresent(txtTax, "Phone"))
+			return false;
+		if (!Validator1.isPresent(txtTotalPrice, "Email"))
+			return false;
+
+		// if (!Validator.isDouble(txtScoreObtained, txtMaxScore, "Score Obtained"))
+		// return false;
+		// if(!Validator.isDouble(txtMaxScore," Max Score ")) return false;
+		return true;
+	}
+
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					AdnanInvoice frame = new AdnanInvoice();
+					frame.setVisible(true);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+}

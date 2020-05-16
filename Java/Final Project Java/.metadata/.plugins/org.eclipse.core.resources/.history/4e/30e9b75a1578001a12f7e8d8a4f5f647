@@ -1,0 +1,71 @@
+package Business;
+
+public class StoreInvoiceDetails {
+//Variable Declaration
+	private int invoiceId;
+	private String serialNumber; 
+	private double unitPrice;
+	private int quantity; 
+	private double discount; 
+	private double totalItemTax;
+	private double totalItemPrice;
+	
+	//Constructors
+	public StoreInvoiceDetails() {	}
+	public StoreInvoiceDetails(int invoiceId,String serialNumber,double unitPrice,
+			int quantity,double discount,double totalItemTax,double totalItemPrice) {	
+	this.invoiceId=invoiceId;
+	this.serialNumber= serialNumber; 
+	this.unitPrice=unitPrice;
+	this.quantity=quantity; 
+	this.discount=discount; 
+	this.totalItemTax=totalItemTax;
+	this.totalItemPrice=totalItemPrice;			
+	}
+	//setters and getters
+	public void setInvoiceId(int invoiceId) {
+		this.invoiceId=invoiceId;
+	}
+	public int getInvoiceId() {
+		return this.invoiceId;
+	}
+	public void setSerialNumber(String serialNumber) {
+		 this.serialNumber=serialNumber;
+	}
+	public String getSerialNumber() {
+		 return this.serialNumber;
+	}
+	public void setUnitPrice(double unitPrice) {
+		this.unitPrice=unitPrice;
+	}
+	public double getUnitPrice() {
+		return this.unitPrice;
+	}
+	public void setQuantity(int quantity) {
+		this.quantity=quantity; 
+	}
+	public int getQuantity() {
+		return this.quantity; 
+	}
+	public void setDiscount(double discount) {
+		this.discount=discount;
+	}
+	public double getDiscount() {
+		return this.discount;
+	}
+	public void setTotalItemTax(double totalItemTax) {
+		this.totalItemTax=totalItemTax;
+	}
+	public double getTotalItemTax() {
+		return this.totalItemTax;
+	}
+	public void setTotalItemPrice(double totalItemPrice) {
+		this.totalItemPrice=totalItemPrice;	
+	}
+	public double getTotalItemPrice() {
+		return this.totalItemPrice;	
+	}
+	
+
+
+}
